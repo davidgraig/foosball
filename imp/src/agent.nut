@@ -84,7 +84,8 @@ device.on("player1_scored", function(voltage) {
     }
     if (goal_keeper.isGameInProgress()) {
         goal_keeper.player1Scored();
-        sendMessageToHipchat("             " + goal_keeper.getScore() + " " + goal_keeper.player_1_name + "scores!");
+        
+        sendMessageToHipchat(goal_keeper.player_1_name + " scores! " + goal_keeper.getScore());
     }
     
 }); 
@@ -95,7 +96,7 @@ device.on("player2_scored", function(voltage) {
     }
     if (goal_keeper.isGameInProgress()) {
         goal_keeper.player2Scored();
-        sendMessageToHipchat(goal_keeper.player_2_name + " scores! " + goal_keeper.getScore());
+        sendMessageToHipchat(".                      " + goal_keeper.getScore() + " " + goal_keeper.player_2_name + " scores!");
     }
 });
 
