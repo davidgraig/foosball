@@ -47,7 +47,7 @@ class GoalKeeper {
     
     function disallowLastGoal() {
         if (goal_stack.len() > 0) {
-            last_goal = goal_stack.pop();
+            local last_goal = goal_stack.pop();
             if (last_goal == player_1_name && player_1_score > 0) {
                 player_1_score--;
             } else if (last_goal == player_2_name && player_2_score > 0) {
