@@ -68,7 +68,7 @@ local goal_keeper = GoalKeeper();
 
 device.on("wake_up" function(voltage) {
     if (isLogging) {
-        server.log("wake_up");
+        server.log("wake_up. voltage: " + voltage);
     }
     checkVoltage(voltage);
     if (!goal_keeper.isGameInProgress()) {
@@ -116,7 +116,7 @@ device.on("reset_game", function(voltage) {
     }
     if (goal_keeper.isGameInProgress()) {
         local final_score = goal_keeper.getScore();
-        sendMessageToHipchat("Final Score: " + final_score);
+        sendMessageToHipchat("Final Score: " + goal_keeper.player_1_name + " " + final_score + " " + goal_keeper.player_2_name);
         goal_keeper.endGame();
         goal_keeper.reset();
         sendMessageToHipchat(game_reset_message, "yellow");
@@ -137,7 +137,7 @@ function setTimer() {
     }
     timer = imp.wakeup(time_limit, function() {
         local final_score = goal_keeper.getScore();
-        sendMessageToHipchat("Final Score: " + final_score);
+        sendMessageToHipchat("Final Score: " + goal_keeper.player_1_name + " " + final_score + " " + goal_keeper.player_2_name);
         
         goal_keeper.endGame();
         goal_keeper.reset();
