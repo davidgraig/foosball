@@ -9,6 +9,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.parse.LogInCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -67,8 +71,15 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog.setMessage("Authenticating...");
         progressDialog.show();
 
-        // TODO: Implement authentication logic here.
-
+        ParseUser.logInInBackground(mEmailEditText.getText().toString(), mPasswordEditText.getText().toString(), new LogInCallback() {
+            public void done(ParseUser user, ParseException e) {
+                if (user != null) {
+                    onLoginSuccess();
+                } else {
+                    onLoginFailed();
+                }
+            }
+        });
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {

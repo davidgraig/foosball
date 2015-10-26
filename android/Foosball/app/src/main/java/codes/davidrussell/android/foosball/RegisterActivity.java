@@ -10,6 +10,10 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
@@ -17,8 +21,6 @@ import butterknife.OnClick;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    @Bind(R.id.textview_name)
-    EditText mNameEditText;
     @Bind(R.id.textview_email)
     EditText mEmailEditText;
     @Bind(R.id.textview_password)
@@ -27,7 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_signup);
+        setContentView(R.layout.activity_register);
         ButterKnife.bind(this);
     }
 
@@ -66,19 +68,19 @@ public class RegisterActivity extends AppCompatActivity {
         progressDialog.setMessage("Registering...");
         progressDialog.show();
 
-        // TODO: Implement register logic here.
-
-
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onRegisterSuccess or onRegisterFailed
-                        // depending on success
-                        onRegisterSuccess(registerButton);
-                        // onRegisterFailed();
-                        progressDialog.dismiss();
-                    }
-                }, 3000);
+        ParseUser user = new ParseUser();
+        user.setUsername(mEmailEditText.getText().toString());
+        user.setPassword(mPasswordEditText.getText().toString());
+        user.setEmail(mEmailEditText.getText().toString());
+        user.signUpInBackground(new SignUpCallback() {
+            public void done(ParseException e) {
+                if (e == null) {
+                   onRegisterSuccess(registerButton);
+                } else {
+                    onRegisterFailed(registerButton);
+                }
+            }
+        });
     }
 
 
@@ -96,16 +98,8 @@ public class RegisterActivity extends AppCompatActivity {
     private boolean validate() {
         boolean valid = true;
 
-        String name = mNameEditText.getText().toString();
         String email = mEmailEditText.getText().toString();
         String password = mPasswordEditText.getText().toString();
-
-        if (name.isEmpty() || name.length() < 3) {
-            mNameEditText.setError("at least 3 characters");
-            valid = false;
-        } else {
-            mNameEditText.setError(null);
-        }
 
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             mEmailEditText.setError("enter a valid email address");
