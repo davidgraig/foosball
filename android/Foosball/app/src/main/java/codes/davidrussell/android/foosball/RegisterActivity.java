@@ -1,0 +1,126 @@
+package codes.davidrussell.android.foosball;
+
+import android.app.ProgressDialog;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
+
+public class RegisterActivity extends AppCompatActivity {
+
+    @Bind(R.id.textview_name)
+    EditText mNameEditText;
+    @Bind(R.id.textview_email)
+    EditText mEmailEditText;
+    @Bind(R.id.textview_password)
+    EditText mPasswordEditText;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_signup);
+        ButterKnife.bind(this);
+    }
+
+    @OnClick(R.id.link_login)
+    public void loginLinkClick(View v) {
+        finish();
+    }
+
+    @OnCheckedChanged(R.id.show_password)
+    protected void showPassword(CompoundButton compoundButton, boolean isChecked) {
+        if (isChecked) {
+            mPasswordEditText.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        } else {
+            mPasswordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        }
+    }
+
+    @OnClick(R.id.link_login)
+    protected void launchLoginActivity(View view) {
+        finish();
+    }
+
+    @OnClick(R.id.button_register)
+    public void register(View v) {
+        final Button registerButton = (Button) v;
+
+        if (!validate()) {
+            onRegisterFailed(registerButton);
+            return;
+        }
+
+        registerButton.setEnabled(false);
+
+        final ProgressDialog progressDialog = new ProgressDialog(RegisterActivity.this);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Registering...");
+        progressDialog.show();
+
+        // TODO: Implement register logic here.
+
+
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        // On complete call either onRegisterSuccess or onRegisterFailed
+                        // depending on success
+                        onRegisterSuccess(registerButton);
+                        // onRegisterFailed();
+                        progressDialog.dismiss();
+                    }
+                }, 3000);
+    }
+
+
+    private void onRegisterSuccess(Button registerButton) {
+        registerButton.setEnabled(true);
+        setResult(RESULT_OK, null);
+        finish();
+    }
+
+    private void onRegisterFailed(Button registerButton) {
+        Toast.makeText(getBaseContext(), "Registration failed", Toast.LENGTH_LONG).show();
+        registerButton.setEnabled(true);
+    }
+
+    private boolean validate() {
+        boolean valid = true;
+
+        String name = mNameEditText.getText().toString();
+        String email = mEmailEditText.getText().toString();
+        String password = mPasswordEditText.getText().toString();
+
+        if (name.isEmpty() || name.length() < 3) {
+            mNameEditText.setError("at least 3 characters");
+            valid = false;
+        } else {
+            mNameEditText.setError(null);
+        }
+
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            mEmailEditText.setError("enter a valid email address");
+            valid = false;
+        } else {
+            mEmailEditText.setError(null);
+        }
+
+        if (password.isEmpty() || password.length() < 4) {
+            mPasswordEditText.setError("greater than 4 characters");
+            valid = false;
+        } else {
+            mPasswordEditText.setError(null);
+        }
+
+        return valid;
+    }
+}
