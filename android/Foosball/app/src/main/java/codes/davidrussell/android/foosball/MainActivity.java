@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
         if (ParseUser.getCurrentUser() == null) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
-            this.finish();
         }
     }
 

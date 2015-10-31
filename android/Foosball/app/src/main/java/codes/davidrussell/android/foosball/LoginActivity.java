@@ -3,6 +3,8 @@ package codes.davidrussell.android.foosball;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +23,8 @@ import butterknife.OnClick;
 public class LoginActivity extends AppCompatActivity {
     private static final int REQUEST_REGISTER = 0;
 
+    @Bind(R.id.coordinator_layout)
+    CoordinatorLayout coordinatorLayout;
     @Bind(R.id.textview_email)
     EditText mEmailEditText;
     @Bind(R.id.textview_password)
@@ -42,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 // TODO: Implement successful register logic here
                 // By default we just finish the Activity and log them in automatically
-                this.finish();
+                finish();
             }
         }
     }
@@ -61,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
     @OnClick(R.id.button_login)
     public void login(View view) {
         if (!validate()) {
-            onLoginFailed();
+            onLoginFailed("Invalid data entered");
             return;
         }
 
@@ -76,20 +80,13 @@ public class LoginActivity extends AppCompatActivity {
             public void done(ParseUser user, ParseException e) {
                 if (user != null) {
                     onLoginSuccess();
+                    progressDialog.dismiss();
                 } else {
-                    onLoginFailed();
+                    onLoginFailed(e.getMessage());
+                    progressDialog.dismiss();
                 }
             }
         });
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onLoginSuccess or onLoginFailed
-                        onLoginSuccess();
-                        // onLoginFailed();
-                        progressDialog.dismiss();
-                    }
-                }, 3000);
     }
 
     private void onLoginSuccess() {
@@ -97,9 +94,8 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    private void onLoginFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
-
+    private void onLoginFailed(String reason) {
+        Snackbar.make(coordinatorLayout, "Login Failed: " + reason, Snackbar.LENGTH_LONG).show();
         mLoginButton.setEnabled(true);
     }
 

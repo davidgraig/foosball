@@ -2,6 +2,8 @@ package codes.davidrussell.android.foosball;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.View;
@@ -21,6 +23,8 @@ import butterknife.OnClick;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    @Bind(R.id.coordinator_layout)
+    CoordinatorLayout coordinatorLayout;
     @Bind(R.id.textview_email)
     EditText mEmailEditText;
     @Bind(R.id.textview_password)
@@ -57,7 +61,7 @@ public class RegisterActivity extends AppCompatActivity {
         final Button registerButton = (Button) v;
 
         if (!validate()) {
-            onRegisterFailed(registerButton);
+            onRegisterFailed(registerButton, "Invalid data entered");
             return;
         }
 
@@ -75,9 +79,9 @@ public class RegisterActivity extends AppCompatActivity {
         user.signUpInBackground(new SignUpCallback() {
             public void done(ParseException e) {
                 if (e == null) {
-                   onRegisterSuccess(registerButton);
+                    onRegisterSuccess(registerButton);
                 } else {
-                    onRegisterFailed(registerButton);
+                    onRegisterFailed(registerButton, e.getMessage());
                 }
             }
         });
@@ -90,8 +94,8 @@ public class RegisterActivity extends AppCompatActivity {
         finish();
     }
 
-    private void onRegisterFailed(Button registerButton) {
-        Toast.makeText(getBaseContext(), "Registration failed", Toast.LENGTH_LONG).show();
+    private void onRegisterFailed(Button registerButton, String reason) {
+        Snackbar.make(coordinatorLayout, "Login Failed: " + reason, Snackbar.LENGTH_LONG).show();
         registerButton.setEnabled(true);
     }
 
