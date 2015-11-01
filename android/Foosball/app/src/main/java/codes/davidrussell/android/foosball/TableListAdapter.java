@@ -27,6 +27,12 @@ public class TableListAdapter extends RecyclerView.Adapter<TableListViewHolder> 
 
     @Override
     public void onBindViewHolder(TableListViewHolder holder, int position) {
+        holder.getNameTextView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
         ParseObject parseObject = mTables.get(position);
         holder.getNameTextView().setText(parseObject.getString("name"));
         //holder.getAvailabilityTextView().setText(parseObject.getString("availability"));
