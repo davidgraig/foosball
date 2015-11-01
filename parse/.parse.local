@@ -1,0 +1,10 @@
+{
+  "applications": {
+    "_default": {
+      "link": "foos"
+    },
+    "foos": {
+      "applicationId": "4vFefzZizmLjr0JufPGih1Daa85YNl2etUwj58do"
+    }
+  }
+}
