@@ -1,13 +1,17 @@
 package codes.davidrussell.android.foosball;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,12 +44,18 @@ public class MainActivity extends AppCompatActivity {
     CoordinatorLayout mCoordinatorLayout;
     @Bind(R.id.table_list)
     RecyclerView mRecyclerView;
+    @Bind(R.id.toolbar)
+    Toolbar mToolbar;
+
+    @Bind(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout mCollapsingToolbarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        setSupportActionBar(mToolbar);
 
         if (ParseUser.getCurrentUser() == null) {
             Intent intent = new Intent(this, LoginActivity.class);
@@ -64,13 +74,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick(R.id.logout)
-    public void logout() {
-        ParseUser.logOutInBackground();
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-        this.finish();
-    }
+//    @OnClick(R.id.logout)
+//    public void logout() {
+//        ParseUser.logOutInBackground();
+//        Intent intent = new Intent(this, LoginActivity.class);
+//        startActivity(intent);
+//        this.finish();
+//    }
 
     private void showTables() {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
