@@ -12,7 +12,12 @@ import java.util.List;
 
 public class TableListAdapter extends RecyclerView.Adapter<TableListViewHolder> {
 
-    List<ParseObject> mTables = new ArrayList<>();
+    private List<ParseObject> mTables = new ArrayList<>();
+    private TableSelectedListener mTableSelectedListener;
+
+    public void setTableSelectedListener(TableSelectedListener tableSelectedListener) {
+       mTableSelectedListener = tableSelectedListener;
+    }
 
     public void setData(List<ParseObject> tables) {
         mTables = tables;
@@ -26,11 +31,11 @@ public class TableListAdapter extends RecyclerView.Adapter<TableListViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(TableListViewHolder holder, int position) {
+    public void onBindViewHolder(TableListViewHolder holder, final int position) {
         holder.getNameTextView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                mTableSelectedListener.onTableSelected(mTables.get(position));
             }
         });
         ParseObject parseObject = mTables.get(position);

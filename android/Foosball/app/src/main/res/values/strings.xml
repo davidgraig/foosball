@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Available Tables</string>
+    <string name="app_name">Foosball</string>
     <string name="action_settings">Settings</string>
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>

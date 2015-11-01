@@ -1,5 +1,7 @@
 package codes.davidrussell.android.foosball;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -26,6 +28,8 @@ public class TableListFragment extends Fragment {
     @Bind(R.id.table_list)
     RecyclerView mRecyclerView;
 
+    TableSelectedListener mTableSelectedListener;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -33,6 +37,18 @@ public class TableListFragment extends Fragment {
         ButterKnife.bind(this, tableListView);
         showTables();
         return tableListView;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            mTableSelectedListener = (TableSelectedListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
     }
 
     private void showTables() {
@@ -45,6 +61,7 @@ public class TableListFragment extends Fragment {
             public void done(List<ParseObject> tableList, ParseException e) {
                 if (e == null) {
                     tableAdapter.setData(tableList);
+                    tableAdapter.setTableSelectedListener(mTableSelectedListener);
                 } else {
                     Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Error Getting Tables: " + e.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
                 }

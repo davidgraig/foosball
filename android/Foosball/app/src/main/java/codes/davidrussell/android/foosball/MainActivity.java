@@ -5,9 +5,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TableSelectedListener {
 
     public static final int REQUEST_LOGIN = 0;
 
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         } else {
-           addTableListFragment();
+            addTableListFragment();
         }
     }
 
@@ -33,6 +34,13 @@ public class MainActivity extends AppCompatActivity {
                 addTableListFragment();
             }
         }
+    }
+
+    @Override
+    public void onTableSelected(ParseObject table) {
+        Intent detailIntent = new Intent(this, TableDetailActivity.class);
+        detailIntent.putExtra(TableDetailFragment.ARG_ITEM_ID, table.getObjectId());
+        startActivity(detailIntent);
     }
 
     private void addTableListFragment() {
