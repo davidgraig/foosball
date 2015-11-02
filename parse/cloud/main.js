@@ -27,7 +27,10 @@ Parse.Cloud.define("unlockTable", function(request, response) {
 	table.id = tableId;
 
 	table.set("locked", false);
-
+	table.set("player1UserId", null);
+	table.set("player1Score", 0);
+	table.set("player2UserId", null);
+	table.set("player2Score", 0);
 	// Save
 	table.save(null, {
 	  success: function(table) {
