@@ -1,17 +1,23 @@
 package codes.davidrussell.android.foosball;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.parse.FunctionCallback;
 import com.parse.GetCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -70,5 +76,16 @@ public class TableDetailFragment extends Fragment {
         game.put("player1Score", mTable.getInt("player1Score"));
         game.put("player2Score", mTable.getInt("player2Score"));
         game.saveInBackground();
+        Map<String, String> params = new HashMap<>();
+        params.put("tableId", mTable.getObjectId());
+        ParseCloud.callFunctionInBackground("unlockTable", params, new FunctionCallback<String>() {
+            public void done(String response, ParseException e) {
+                if (e == null) {
+                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Game Submitted", Snackbar.LENGTH_LONG).show();
+                } else {
+                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Error submitting Game: " + e.getLocalizedMessage(), Snackbar.LENGTH_LONG);
+                }
+            }
+        });
     }
 }

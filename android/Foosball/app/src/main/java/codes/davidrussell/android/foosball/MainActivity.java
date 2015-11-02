@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements TableSelectedList
 
         if (ParseUser.getCurrentUser() == null) {
             Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_LOGIN);
         } else {
             addTableListFragment();
         }
@@ -54,13 +54,12 @@ public class MainActivity extends AppCompatActivity implements TableSelectedList
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_logout) {
+            ParseUser.logOutInBackground();
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -72,11 +71,4 @@ public class MainActivity extends AppCompatActivity implements TableSelectedList
         tableListFragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction().add(R.id.coordinator_layout, tableListFragment).commit();
     }
-
-//    public void logout() {
-//        ParseUser.logOutInBackground();
-//        Intent intent = new Intent(this, LoginActivity.class);
-//        startActivity(intent);
-//        this.finish();
-//    }
 }

@@ -13,13 +13,13 @@ public class TableDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_table_detail);
 
         Intent intent = getIntent();
-        int tableId = intent.getIntExtra(TableDetailFragment.ARG_ITEM_ID, -1);
+        String tableId = intent.getStringExtra(TableDetailFragment.ARG_ITEM_ID);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
         Bundle bundle = new Bundle();
-        bundle.putInt(TableDetailFragment.ARG_ITEM_ID, tableId);
+        bundle.putString(TableDetailFragment.ARG_ITEM_ID, tableId);
         TableDetailFragment tableDetailFragment = new TableDetailFragment();
         tableDetailFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().add(R.id.coordinator_layout, tableDetailFragment).commit();
