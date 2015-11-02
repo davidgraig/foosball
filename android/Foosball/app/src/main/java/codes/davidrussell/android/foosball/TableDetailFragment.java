@@ -1,7 +1,7 @@
 package codes.davidrussell.android.foosball;
 
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,13 +17,12 @@ public class TableDetailFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("GameScore");
-        query.getInBackground("xWMyZ4YEGZ", new GetCallback<ParseObject>() {
+        String parseObjectId = getActivity().getIntent().getStringExtra(ARG_ITEM_ID);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Table");
+        query.getInBackground(parseObjectId, new GetCallback<ParseObject>() {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
-                    // object will be your game score
+                    getActivity().setTitle(object.getString("name"));
                 } else {
                     // something went wrong
                 }
@@ -31,7 +30,5 @@ public class TableDetailFragment extends Fragment {
         });
 
         return inflater.inflate(R.layout.fragment_table_detail, container, false);
-
-
     }
 }
