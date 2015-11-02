@@ -1,4 +1,4 @@
-Parse.Cloud.define("activateTable", function(request, response) {
+Parse.Cloud.define("lockTable", function(request, response) {
 	tableId = request.params.tableId;
 
 	var Table = Parse.Object.extend("Table");
@@ -19,7 +19,7 @@ Parse.Cloud.define("activateTable", function(request, response) {
 	});
 });
 
-Parse.Cloud.define("resetTable", function(request, response) {
+Parse.Cloud.define("unlockTable", function(request, response) {
 	tableId = request.params.tableId;
 
 	var Table = Parse.Object.extend("Table");
