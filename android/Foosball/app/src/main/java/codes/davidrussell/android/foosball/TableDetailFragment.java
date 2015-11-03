@@ -93,22 +93,21 @@ public class TableDetailFragment extends Fragment {
             }
         });
 
-        mTimerSubscription = Observable.interval(2, TimeUnit.SECONDS, Schedulers.io()).map(new Func1<Long, ParseObject>() {
+        mTimerSubscription = Observable.interval(2, TimeUnit.SECONDS, Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Long>() {
             @Override
-            public ParseObject call(Long aLong) {
-                try {
-                    mTable.fetch();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                return mTable;
-            }
+            public void call(Long parseObject) {
+                mTable.fetchInBackground(new GetCallback<ParseObject>() {
+                    @Override
+                    public void done(ParseObject object, ParseException e) {
+                        if (e == null) {
+                            mPlayer1Score.setText(String.valueOf(object.getInt("player1Score")));
+                            mPlayer2Score.setText(String.valueOf(object.getInt("player2Score")));
+                        } else {
+                            Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Error updating : " + e.getLocalizedMessage(), Snackbar.LENGTH_LONG);
+                        }
+                    }
+                });
 
-        }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ParseObject>() {
-            @Override
-            public void call(ParseObject parseObject) {
-                mPlayer1Score.setText(mTable.getString("player1Score"));
-                mPlayer2Score.setText(mTable.getString("player2Score"));
             }
         });
 
@@ -121,6 +120,7 @@ public class TableDetailFragment extends Fragment {
         mTable.saveInBackground();
         mPlayer1SignIn.setEnabled(false);
         mPlayer2SignIn.setEnabled(false);
+        mStatus.setText("Playing as Yellow");
     }
 
     @OnClick(R.id.black_sign_in)
@@ -129,6 +129,7 @@ public class TableDetailFragment extends Fragment {
         mTable.saveInBackground();
         mPlayer1SignIn.setEnabled(false);
         mPlayer2SignIn.setEnabled(false);
+        mStatus.setText("Playing as Black");
     }
 
     @OnClick(R.id.commit_game)
@@ -164,6 +165,22 @@ public class TableDetailFragment extends Fragment {
                     Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Game Submitted", Snackbar.LENGTH_LONG).show();
                 } else {
                     Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Error submitting Game: " + e.getLocalizedMessage(), Snackbar.LENGTH_LONG);
+                }
+                getActivity().finish();
+            }
+        });
+    }
+
+    @OnClick(R.id.reset_game)
+    public void onResetGameClicked(View view) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("tableId", mTable.getObjectId());
+        ParseCloud.callFunctionInBackground("unlockTable", params, new FunctionCallback<String>() {
+            public void done(String response, ParseException e) {
+                if (e == null) {
+                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Game Reset", Snackbar.LENGTH_LONG).show();
+                } else {
+                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Error resetting Game: " + e.getLocalizedMessage(), Snackbar.LENGTH_LONG);
                 }
                 getActivity().finish();
             }
