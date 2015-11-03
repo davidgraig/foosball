@@ -1,6 +1,5 @@
 package codes.davidrussell.android.foosball;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
