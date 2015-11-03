@@ -3,9 +3,11 @@ package codes.davidrussell.android.foosball;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.parse.FunctionCallback;
@@ -16,22 +18,39 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import org.w3c.dom.Text;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observable;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class TableDetailFragment extends Fragment {
 
     public static final String ARG_ITEM_ID = "ITEM_ID";
 
+    @Bind(R.id.status)
+    protected TextView mStatus;
     @Bind(R.id.player_1_score)
     protected TextView mPlayer1Score;
     @Bind(R.id.player_2_score)
     protected TextView mPlayer2Score;
+    @Bind(R.id.yellow_sign_in)
+    protected Button mPlayer1SignIn;
+    @Bind(R.id.black_sign_in)
+    protected Button mPlayer2SignIn;
+
     private ParseObject mTable;
+    private Subscription mTimerSubscription;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,9 +67,48 @@ public class TableDetailFragment extends Fragment {
                     getActivity().setTitle(mTable.getString("name"));
                     mPlayer1Score.setText(player1Score);
                     mPlayer2Score.setText(player2Score);
+                    String player1UserId = mTable.getString("player1UserId");
+                    String player2UserId = mTable.getString("player2UserId");
+
+                    if (!TextUtils.isEmpty(player1UserId)) {
+                        mPlayer1SignIn.setEnabled(false);
+                    }
+                    if (!TextUtils.isEmpty(player2UserId)) {
+                        mPlayer2SignIn.setEnabled(false);
+                    }
+
+                    if (ParseUser.getCurrentUser().getObjectId().equals(player1UserId)) {
+                        mStatus.setText("Playing as Yellow");
+                        mPlayer1SignIn.setEnabled(false);
+                        mPlayer2SignIn.setEnabled(false);
+                    } else if (ParseUser.getCurrentUser().getObjectId().equals(player2UserId)) {
+                        mStatus.setText("Playing as Black");
+                        mPlayer1SignIn.setEnabled(false);
+                        mPlayer2SignIn.setEnabled(false);
+                    }
+
                 } else {
                     getActivity().finish();
                 }
+            }
+        });
+
+        mTimerSubscription = Observable.interval(2, TimeUnit.SECONDS, Schedulers.io()).map(new Func1<Long, ParseObject>() {
+            @Override
+            public ParseObject call(Long aLong) {
+                try {
+                    mTable.fetch();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                return mTable;
+            }
+
+        }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ParseObject>() {
+            @Override
+            public void call(ParseObject parseObject) {
+                mPlayer1Score.setText(mTable.getString("player1Score"));
+                mPlayer2Score.setText(mTable.getString("player2Score"));
             }
         });
 
@@ -61,12 +119,16 @@ public class TableDetailFragment extends Fragment {
     public void onYellowButtonClick(View view) {
         mTable.put("player1UserId", ParseUser.getCurrentUser().getObjectId());
         mTable.saveInBackground();
+        mPlayer1SignIn.setEnabled(false);
+        mPlayer2SignIn.setEnabled(false);
     }
 
     @OnClick(R.id.black_sign_in)
     public void onBlackButtonClick(View view) {
         mTable.put("player2UserId", ParseUser.getCurrentUser().getObjectId());
         mTable.saveInBackground();
+        mPlayer1SignIn.setEnabled(false);
+        mPlayer2SignIn.setEnabled(false);
     }
 
     @OnClick(R.id.commit_game)
@@ -103,7 +165,16 @@ public class TableDetailFragment extends Fragment {
                 } else {
                     Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Error submitting Game: " + e.getLocalizedMessage(), Snackbar.LENGTH_LONG);
                 }
+                getActivity().finish();
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mTimerSubscription != null && !mTimerSubscription.isUnsubscribed()) {
+            mTimerSubscription.unsubscribe();
+        }
+        super.onDestroy();
     }
 }

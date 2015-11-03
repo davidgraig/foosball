@@ -76,6 +76,7 @@ public class RegisterActivity extends AppCompatActivity {
         user.setUsername(mEmailEditText.getText().toString());
         user.setPassword(mPasswordEditText.getText().toString());
         user.setEmail(mEmailEditText.getText().toString());
+        user.put("rating", 1000);
         user.signUpInBackground(new SignUpCallback() {
             public void done(ParseException e) {
                 if (e == null) {
