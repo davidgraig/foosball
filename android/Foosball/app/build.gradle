@@ -29,4 +29,5 @@ dependencies {
     compile 'com.parse:parse-android:1.10.3'
     compile 'com.jakewharton:butterknife:6.1.0'
     compile 'de.hdodenhof:circleimageview:2.0.0'
+    compile 'com.infstory:rxparse:2.0.1'
 }

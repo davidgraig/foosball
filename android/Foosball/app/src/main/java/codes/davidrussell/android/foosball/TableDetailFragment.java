@@ -31,7 +31,6 @@ public class TableDetailFragment extends Fragment {
     protected TextView mPlayer1Score;
     @Bind(R.id.player_2_score)
     protected TextView mPlayer2Score;
-
     private ParseObject mTable;
 
     @Override
@@ -44,9 +43,11 @@ public class TableDetailFragment extends Fragment {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     mTable = object;
+                    String player1Score = String.valueOf(mTable.getInt("player1Score"));
+                    String player2Score = String.valueOf(mTable.getInt("player2Score"));
                     getActivity().setTitle(mTable.getString("name"));
-                    mPlayer1Score.setText(mTable.getString("player1Score"));
-                    mPlayer2Score.setText(mTable.getString("player2Score"));
+                    mPlayer1Score.setText(player1Score);
+                    mPlayer2Score.setText(player2Score);
                 } else {
                     getActivity().finish();
                 }
@@ -70,15 +71,32 @@ public class TableDetailFragment extends Fragment {
 
     @OnClick(R.id.commit_game)
     public void onSubmitGameClicked(View view) {
+
+        int player1Score = mTable.getInt("player1Score");
+        int player2Score = mTable.getInt("player2Score");
+        String player1UserId = mTable.getString("player1UserId");
+        String player2UserId = mTable.getString("player2UserId");
+
         ParseObject game = ParseObject.create("Game");
         game.put("player1UserId", mTable.getString("player1UserId"));
         game.put("player2UserId", mTable.getString("player2UserId"));
         game.put("player1Score", mTable.getInt("player1Score"));
         game.put("player2Score", mTable.getInt("player2Score"));
         game.saveInBackground();
-        Map<String, String> params = new HashMap<>();
+
+        float player1EloScore = 0;
+        if (player1Score > player2Score) {
+            player1EloScore = 1;
+        } else if (player1Score == player2Score) {
+            player1EloScore = 0.5f;
+        }
+
+        Map<String, Object> params = new HashMap<>();
         params.put("tableId", mTable.getObjectId());
-        ParseCloud.callFunctionInBackground("unlockTable", params, new FunctionCallback<String>() {
+        params.put("player1UserId", player1UserId);
+        params.put("player2UserId", player2UserId);
+        params.put("player1EloScore", Float.toString(player1EloScore));
+        ParseCloud.callFunctionInBackground("submitGame", params, new FunctionCallback<String>() {
             public void done(String response, ParseException e) {
                 if (e == null) {
                     Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Game Submitted", Snackbar.LENGTH_LONG).show();
