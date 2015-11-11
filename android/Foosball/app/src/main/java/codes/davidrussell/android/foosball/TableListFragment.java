@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,8 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
@@ -21,11 +20,20 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.parse.ParseObservable;
+import rx.schedulers.Schedulers;
 
 public class TableListFragment extends Fragment {
 
+    @Bind(R.id.table_list_swipe_refresh)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+
     @Bind(R.id.table_list)
     RecyclerView mRecyclerView;
+
+    TableListAdapter mTableListAdapter;
 
     TableSelectedListener mTableSelectedListener;
 
@@ -34,7 +42,21 @@ public class TableListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View tableListView = inflater.inflate(R.layout.fragment_table_list, container, false);
         ButterKnife.bind(this, tableListView);
-        showTables();
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mTableListAdapter = new TableListAdapter();
+        mRecyclerView.setAdapter(mTableListAdapter);
+
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshTableList();
+            }
+        });
+
+        refreshTableList();
+
         return tableListView;
     }
 
@@ -50,22 +72,26 @@ public class TableListFragment extends Fragment {
         }
     }
 
-    private void showTables() {
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        final TableListAdapter tableAdapter = new TableListAdapter();
-        mRecyclerView.setAdapter(tableAdapter);
+    private void refreshTableList() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Table");
-        query.findInBackground(new FindCallback<ParseObject>() {
-            public void done(List<ParseObject> tableList, ParseException e) {
-                if (e == null) {
-                    tableAdapter.setData(tableList);
-                    tableAdapter.setTableSelectedListener(mTableSelectedListener);
-                } else {
-                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Error Getting Tables: " + e.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
-                }
-            }
-        });
+        ParseObservable.find(query)
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<ParseObject>>() {
+                    @Override
+                    public void call(List<ParseObject> tableList) {
+                        mTableListAdapter.setData(tableList);
+                        mTableListAdapter.setTableSelectedListener(mTableSelectedListener);
+                        if (mSwipeRefreshLayout.isRefreshing()) {
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Error Getting Tables: " + throwable.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
+                    }
+                });
     }
-
 }
