@@ -10,6 +10,11 @@ import android.view.MenuItem;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import codes.davidrussell.android.foosball.table.TableDetailActivity;
+import codes.davidrussell.android.foosball.table.TableDetailFragment;
+import codes.davidrussell.android.foosball.table.TableListFragment;
+import codes.davidrussell.android.foosball.table.TableSelectedListener;
+
 public class MainActivity extends AppCompatActivity implements TableSelectedListener {
 
     public static final int REQUEST_LOGIN = 0;

@@ -1,4 +1,4 @@
-package codes.davidrussell.android.foosball;
+package codes.davidrussell.android.foosball.table;
 
 import com.parse.ParseObject;
 

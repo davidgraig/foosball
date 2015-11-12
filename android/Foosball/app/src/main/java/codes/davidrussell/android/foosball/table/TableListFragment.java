@@ -1,4 +1,4 @@
-package codes.davidrussell.android.foosball;
+package codes.davidrussell.android.foosball.table;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -20,6 +20,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import codes.davidrussell.android.foosball.R;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.parse.ParseObservable;

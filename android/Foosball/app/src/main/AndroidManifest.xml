@@ -23,11 +23,12 @@
         </activity>
         <activity android:name=".LoginActivity" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".TableDetailActivity">
+        <activity android:name=".table.TableDetailActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity android:name=".player.PlayerListActivity" />
     </application>
 
 </manifest>

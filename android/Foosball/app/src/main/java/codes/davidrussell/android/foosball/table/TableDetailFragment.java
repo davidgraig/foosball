@@ -1,4 +1,4 @@
-package codes.davidrussell.android.foosball;
+package codes.davidrussell.android.foosball.table;
 
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import codes.davidrussell.android.foosball.R;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;

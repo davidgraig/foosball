@@ -1,4 +1,4 @@
-package codes.davidrussell.android.foosball;
+package codes.davidrussell.android.foosball.table;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,8 @@ import android.os.PersistableBundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+
+import codes.davidrussell.android.foosball.R;
 
 public class TableDetailActivity extends AppCompatActivity {
 

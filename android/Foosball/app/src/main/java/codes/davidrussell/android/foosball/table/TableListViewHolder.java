@@ -1,9 +1,10 @@
-package codes.davidrussell.android.foosball;
+package codes.davidrussell.android.foosball.table;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
+import codes.davidrussell.android.foosball.R;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class TableListViewHolder extends RecyclerView.ViewHolder{

@@ -1,4 +1,4 @@
-package codes.davidrussell.android.foosball;
+package codes.davidrussell.android.foosball.table;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +11,8 @@ import com.parse.ParseObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import codes.davidrussell.android.foosball.R;
 
 public class TableListAdapter extends RecyclerView.Adapter<TableListViewHolder> {
 
