@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#1B5E20</color>
     <color name="colorAccent">#FFC107</color>
     <color name="scrim_bottom">#66000000</color>
+    <color name="refresh_progress_1">@color/colorPrimaryDark</color>
+    <color name="refresh_progress_2">@color/colorAccent</color>
+    <color name="refresh_progress_3">@color/colorPrimary</color>
 </resources>

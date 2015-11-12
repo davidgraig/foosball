@@ -49,6 +49,11 @@ public class TableListFragment extends Fragment {
         mTableListAdapter = new TableListAdapter();
         mRecyclerView.setAdapter(mTableListAdapter);
 
+        mSwipeRefreshLayout.setColorSchemeResources(
+                R.color.refresh_progress_1,
+                R.color.refresh_progress_2,
+                R.color.refresh_progress_3);
+
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

@@ -8,4 +8,5 @@
     <string name="link_to_login">Already a member? Login</string>
     <string name="logout">Logout</string>
     <string name="foosball_image_content_description">Foosball Image</string>
+    <string name="action_player_list">Player List</string>
 </resources>

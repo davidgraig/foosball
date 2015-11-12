@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import codes.davidrussell.android.foosball.player.PlayerListActivity;
 import codes.davidrussell.android.foosball.table.TableDetailActivity;
 import codes.davidrussell.android.foosball.table.TableDetailFragment;
 import codes.davidrussell.android.foosball.table.TableListFragment;
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements TableSelectedList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setTitle("Table List");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -64,6 +66,10 @@ public class MainActivity extends AppCompatActivity implements TableSelectedList
         if (id == R.id.action_logout) {
             ParseUser.logOutInBackground();
             Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            return true;
+        } else if (id == R.id.action_player_list) {
+            Intent intent = new Intent(this, PlayerListActivity.class);
             startActivity(intent);
             return true;
         }
