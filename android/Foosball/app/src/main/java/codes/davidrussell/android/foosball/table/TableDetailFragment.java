@@ -128,7 +128,7 @@ public class TableDetailFragment extends Fragment {
     public void onResetGameClicked(View view) {
         Map<String, Object> params = new HashMap<>();
         params.put("tableId", mTable.getObjectId());
-        ParseCloud.callFunctionInBackground("unlockTable", params, new FunctionCallback<String>() {
+        ParseCloud.callFunctionInBackground("resetGame", params, new FunctionCallback<String>() {
             public void done(String response, ParseException e) {
                 if (e == null) {
                     Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Game Reset", Snackbar.LENGTH_LONG).show();

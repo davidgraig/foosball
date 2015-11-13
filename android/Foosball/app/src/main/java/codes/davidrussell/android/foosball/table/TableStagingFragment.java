@@ -26,6 +26,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import codes.davidrussell.android.foosball.R;
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.parse.ParseObservable;
@@ -46,6 +47,7 @@ public class TableStagingFragment extends Fragment {
     private ParseUser mBlackPlayer;
     private ParseUser mYellowPlayer;
     private TableStagingListener mTableStagingListener;
+    private Subscription mUpdateSub;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -69,7 +71,7 @@ public class TableStagingFragment extends Fragment {
 
         update();
 
-        Observable.interval(1, TimeUnit.SECONDS, Schedulers.io())
+        mUpdateSub = Observable.interval(1, TimeUnit.SECONDS, Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<Long>() {
                     @Override
@@ -93,6 +95,16 @@ public class TableStagingFragment extends Fragment {
                 });
 
         return view;
+    }
+
+    @Override
+    public void onDetach() {
+
+        if (mUpdateSub != null && !mUpdateSub.isUnsubscribed()) {
+            mUpdateSub.unsubscribe();
+        }
+
+        super.onDetach();
     }
 
     public void setTableStagingListener(TableStagingListener tableStagingListener) {
