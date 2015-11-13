@@ -57,6 +57,8 @@ public class TableDetailActivity extends AppCompatActivity implements TableStagi
     @Override
     public void stagingFinished() {
         getSupportFragmentManager().beginTransaction().remove(mStaging).commit();
-        getSupportFragmentManager().beginTransaction().add(R.id.coordinator_layout, mScoreCard).commit();
+        if (!mScoreCard.isAdded()) {
+            getSupportFragmentManager().beginTransaction().add(R.id.coordinator_layout, mScoreCard).commit();
+        }
     }
 }

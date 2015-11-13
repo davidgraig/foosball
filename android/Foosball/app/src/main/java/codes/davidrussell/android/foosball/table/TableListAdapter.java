@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,13 +64,13 @@ public class TableListAdapter extends RecyclerView.Adapter<TableListViewHolder> 
 
     @NonNull
     private String getAvailabilityString(ParseObject parseObject) {
-        String player1 = parseObject.getString("player1UserId");
-        String player2 = parseObject.getString("player2UserId");
+        ParseUser player1 = parseObject.getParseUser("player1");
+        ParseUser player2 = parseObject.getParseUser("player2");
         int playerCount = 0;
-        if (!TextUtils.isEmpty(player1)) {
+        if (player1 != null) {
             playerCount++;
         }
-        if (!TextUtils.isEmpty(player2)) {
+        if (player2 != null) {
             playerCount++;
         }
         return "players: " + playerCount + "/2";

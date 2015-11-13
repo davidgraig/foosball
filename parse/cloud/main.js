@@ -1,47 +1,3 @@
-Parse.Cloud.define("lockTable", function(request, response) {
-	tableId = request.params.tableId;
-
-	var Table = Parse.Object.extend("Table");
-	var table = new Table();
-	table.id = tableId;
-
-	// Set a new value on quantity
-	table.set("locked", true);
-
-	// Save
-	table.save(null, {
-	  success: function(table) {
-	    response.success("locked table");
-	  },
-	  error: function(table, error) {
-	    response.error("Error locking table: " + error);
-	  }
-	});
-});
-
-Parse.Cloud.define("unlockTable", function(request, response) {
-	tableId = request.params.tableId;
-
-	var Table = Parse.Object.extend("Table");
-	var table = new Table();
-	table.id = tableId;
-
-	table.set("locked", false);
-	table.set("player1", null);
-	table.set("player1Score", 0);
-	table.set("player2", null);
-	table.set("player2Score", 0);
-	// Save
-	table.save(null, {
-	  success: function(table) {
-	    response.success("unlocked");
-	  },
-	  error: function(table, error) {
-	    response.error("Error unlocking table: " + error);
-	  }
-	});
-});
-
 Parse.Cloud.define("playerScored", function(request, response) {
 	tableId = request.params.tableId;
 	playerNumber = request.params.playerNumber;
@@ -74,9 +30,9 @@ Parse.Cloud.define("playerGoalDisallowed", function(request, response) {
 	var table = new Table();
 	table.id = tableId;
 	if (playerNumber === 1) {
-		table.decrement("player1Score");	
+		table.increment("player1Score", -1);	
 	} else {
-		table.decrement("player2Score");
+		table.increment("player2Score", -1);
 	}
 	
 	// Save
@@ -129,10 +85,33 @@ Parse.Cloud.define("submitGame", function(request, response) {
 		player2.set("rating", player2Score);
 
 		return player1.save().then(player2.save());
-	}).then(Parse.Cloud.run("unlockTable", {"tableId": tableId}))
+	}).then(Parse.Cloud.run("resetGame", {"tableId": tableId}))
 	.then(function(users) {
 		response.success("game submitted");
 	}, function(error) {
 		response.error(JSON.stringify(error));
+	});
+});
+
+Parse.Cloud.define("resetGame", function(request, response) {
+	tableId = request.params.tableId;
+
+	var Table = Parse.Object.extend("Table");
+	var table = new Table();
+	table.id = tableId;
+
+	table.set("locked", false);
+	table.set("player1", null);
+	table.set("player1Score", 0);
+	table.set("player2", null);
+	table.set("player2Score", 0);
+	// Save
+	table.save(null, {
+	  success: function(table) {
+	    response.success("unlocked");
+	  },
+	  error: function(table, error) {
+	    response.error("Error unlocking table: " + error);
+	  }
 	});
 });
