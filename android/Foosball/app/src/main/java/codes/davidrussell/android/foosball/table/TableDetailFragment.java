@@ -3,11 +3,9 @@ package codes.davidrussell.android.foosball.table;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.parse.FunctionCallback;
@@ -36,16 +34,10 @@ public class TableDetailFragment extends Fragment {
 
     public static final String ARG_ITEM_ID = "ITEM_ID";
 
-    @Bind(R.id.status)
-    protected TextView mStatus;
     @Bind(R.id.player_1_score)
     protected TextView mPlayer1Score;
     @Bind(R.id.player_2_score)
     protected TextView mPlayer2Score;
-    @Bind(R.id.yellow_sign_in)
-    protected Button mPlayer1SignIn;
-    @Bind(R.id.black_sign_in)
-    protected Button mPlayer2SignIn;
 
     private ParseObject mTable;
     private Subscription mTimerSubscription;
@@ -65,26 +57,6 @@ public class TableDetailFragment extends Fragment {
                     getActivity().setTitle(mTable.getString("name"));
                     mPlayer1Score.setText(player1Score);
                     mPlayer2Score.setText(player2Score);
-                    String player1UserId = mTable.getString("player1UserId");
-                    String player2UserId = mTable.getString("player2UserId");
-
-                    if (!TextUtils.isEmpty(player1UserId)) {
-                        mPlayer1SignIn.setEnabled(false);
-                    }
-                    if (!TextUtils.isEmpty(player2UserId)) {
-                        mPlayer2SignIn.setEnabled(false);
-                    }
-
-                    if (ParseUser.getCurrentUser().getObjectId().equals(player1UserId)) {
-                        mStatus.setText("Playing as Yellow");
-                        mPlayer1SignIn.setEnabled(false);
-                        mPlayer2SignIn.setEnabled(false);
-                    } else if (ParseUser.getCurrentUser().getObjectId().equals(player2UserId)) {
-                        mStatus.setText("Playing as Black");
-                        mPlayer1SignIn.setEnabled(false);
-                        mPlayer2SignIn.setEnabled(false);
-                    }
-
                 } else {
                     getActivity().finish();
                 }
@@ -110,24 +82,6 @@ public class TableDetailFragment extends Fragment {
         });
 
         return view;
-    }
-
-    @OnClick(R.id.yellow_sign_in)
-    public void onYellowButtonClick(View view) {
-        mTable.put("player1UserId", ParseUser.getCurrentUser().getObjectId());
-        mTable.saveInBackground();
-        mPlayer1SignIn.setEnabled(false);
-        mPlayer2SignIn.setEnabled(false);
-        mStatus.setText("Playing as Yellow");
-    }
-
-    @OnClick(R.id.black_sign_in)
-    public void onBlackButtonClick(View view) {
-        mTable.put("player2UserId", ParseUser.getCurrentUser().getObjectId());
-        mTable.saveInBackground();
-        mPlayer1SignIn.setEnabled(false);
-        mPlayer2SignIn.setEnabled(false);
-        mStatus.setText("Playing as Black");
     }
 
     @OnClick(R.id.commit_game)
