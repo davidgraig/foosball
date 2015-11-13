@@ -60,7 +60,12 @@ public class TableListFragment extends Fragment {
                 refreshTableList();
             }
         });
-
+        mSwipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(true);
+            }
+        });
         refreshTableList();
 
         return tableListView;

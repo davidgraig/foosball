@@ -9,7 +9,10 @@ import android.view.MenuItem;
 
 import codes.davidrussell.android.foosball.R;
 
-public class TableDetailActivity extends AppCompatActivity {
+public class TableDetailActivity extends AppCompatActivity implements TableStagingListener {
+
+    TableStagingFragment mStaging;
+    TableDetailFragment mScoreCard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,9 +27,14 @@ public class TableDetailActivity extends AppCompatActivity {
 
         Bundle bundle = new Bundle();
         bundle.putString(TableDetailFragment.ARG_ITEM_ID, tableId);
-        TableDetailFragment tableDetailFragment = new TableDetailFragment();
-        tableDetailFragment.setArguments(bundle);
-        getSupportFragmentManager().beginTransaction().add(R.id.coordinator_layout, tableDetailFragment).commit();
+        mStaging = new TableStagingFragment();
+        mStaging.setTableStagingListener(this);
+        mStaging.setArguments(bundle);
+
+        mScoreCard = new TableDetailFragment();
+        mScoreCard.setArguments(bundle);
+
+        getSupportFragmentManager().beginTransaction().add(R.id.coordinator_layout, mStaging).commit();
     }
 
 
@@ -44,5 +52,11 @@ public class TableDetailActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void stagingFinished() {
+        getSupportFragmentManager().beginTransaction().remove(mStaging).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.coordinator_layout, mScoreCard).commit();
     }
 }

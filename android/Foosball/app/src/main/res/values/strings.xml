@@ -9,4 +9,10 @@
     <string name="logout">Logout</string>
     <string name="foosball_image_content_description">Foosball Image</string>
     <string name="action_player_list">Player List</string>
+    <string name="yellow">Yellow</string>
+    <string name="play_as_black">PLAY AS BLACK</string>
+    <string name="playing_as_black">PLAYING AS BLACK</string>
+    <string name="play_as_yellow">PLAY AS YELLOW</string>
+    <string name="playing_as_yellow">PLAYING AS YELLOW</string>
+    <string name="waiting_for_opponent">waiting for opponent…</string>
 </resources>
