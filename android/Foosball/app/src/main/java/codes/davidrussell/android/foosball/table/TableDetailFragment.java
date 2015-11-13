@@ -89,12 +89,13 @@ public class TableDetailFragment extends Fragment {
 
         int player1Score = mTable.getInt("player1Score");
         int player2Score = mTable.getInt("player2Score");
-        String player1UserId = mTable.getString("player1UserId");
-        String player2UserId = mTable.getString("player2UserId");
+        String player1UserId = mTable.getParseUser("player1").getObjectId();
+        String player2UserId = mTable.getParseUser("player2").getObjectId();
 
         ParseObject game = ParseObject.create("Game");
-        game.put("player1UserId", mTable.getString("player1UserId"));
-        game.put("player2UserId", mTable.getString("player2UserId"));
+        // TODO: update parse game table with pointers rather than objectids
+        game.put("player1UserId", player1UserId);
+        game.put("player2UserId", player2UserId);
         game.put("player1Score", mTable.getInt("player1Score"));
         game.put("player2Score", mTable.getInt("player2Score"));
         game.saveInBackground();
