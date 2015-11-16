@@ -12,7 +12,7 @@ function player1Score() {
 
 
 function player2Score() {
-    if (player2_pin.read() == 0) {
+    if (player2_pin.read() == 1) {
         agentSend("player2_scored");
     }
 }
@@ -34,7 +34,7 @@ function resetGame() {
 function agentSend(string) {
     local voltage = getVoltage();
     agent.send(string, voltage);
-    imp.sleep(0.75);
+    imp.sleep(2.00);
 }
 
 function getVoltage() {
