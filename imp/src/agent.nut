@@ -1,5 +1,9 @@
-local hipchat_authToken = "AUTH_TOKEN_HERE";
+#require "Parse.class.nut:1.0.1"
+
+local hipchat_authToken = "YOUR_AUTH_TOKEN_HERE";
 local hipchat_prefix = "https://api.hipchat.com/v2/room/672604/notification?auth_token=";
+local parse_appId = "YOUR_PARSE_APP_ID";
+local parse_apiKey = "YOUR_PARSE_API_KEY";
 local isLogging = true;
 local timer = null;
 local time_limit = 300;
@@ -8,6 +12,9 @@ local game_started_message = "Game started.";
 local empty_table_message = "No one is playing!";
 local goal_disallowed_message = "Goal disallowed.";
 local game_reset_message = "Game Reset.";
+local table_id = "LF6M221BkF";
+
+parse <- Parse(parse_appId, parse_apiKey);
 
 class GoalKeeper {
     goal_stack = [];
@@ -48,10 +55,13 @@ class GoalKeeper {
     function disallowLastGoal() {
         if (goal_stack.len() > 0) {
             local last_goal = goal_stack.pop();
+            server.log("Last Goal Scored: " + last_goal);
             if (last_goal == player_1_name && player_1_score > 0) {
                 player_1_score--;
+                return 1;
             } else if (last_goal == player_2_name && player_2_score > 0) {
                player_2_score--;
+               return 2;
             }
         }
     }
@@ -60,20 +70,30 @@ class GoalKeeper {
         return "[" + player_1_score + " - " + player_2_score + "]";
     }
 }
-
-
-
 local goal_keeper = GoalKeeper();
 
 
+
+
+
+/**
+ *  
+ * Device listeners
+ * 
+ **/
+ 
 device.on("wake_up" function(voltage) {
     if (isLogging) {
         server.log("wake_up. voltage: " + voltage);
+        server.log("Score: " + goal_keeper.getScore())
     }
     checkVoltage(voltage);
     if (!goal_keeper.isGameInProgress()) {
         goal_keeper.startGame();
-        sendMessageToHipchat(game_started_message);
+        parse.runCloudFunction("resetGame", {"tableId": table_id}, function(err, response) {
+            server.log(serialize(response));
+        });
+        sendMessageToHipchat(game_reset_message);
     }
     setTimer();
 }); 
@@ -84,8 +104,10 @@ device.on("player1_scored", function(voltage) {
     }
     if (goal_keeper.isGameInProgress()) {
         goal_keeper.player1Scored();
-        
-        sendMessageToHipchat(goal_keeper.player_1_name + " scores! " + goal_keeper.getScore());
+        parse.runCloudFunction("playerScored", {"tableId": table_id, "playerNumber" : 1}, function(err, response) {
+            server.log(serialize(response));
+        });
+        //sendMessageToHipchat(goal_keeper.player_1_name + " scores! " + goal_keeper.getScore());
     }
     
 }); 
@@ -96,7 +118,10 @@ device.on("player2_scored", function(voltage) {
     }
     if (goal_keeper.isGameInProgress()) {
         goal_keeper.player2Scored();
-        sendMessageToHipchat(".                      " + goal_keeper.getScore() + " " + goal_keeper.player_2_name + " scores!");
+        parse.runCloudFunction("playerScored", {"tableId": table_id, "playerNumber" : 2}, function(err, response) {
+            server.log(serialize(response));
+        });
+        //sendMessageToHipchat(".                      " + goal_keeper.getScore() + " " + goal_keeper.player_2_name + " scores!");
     }
 });
 
@@ -105,8 +130,12 @@ device.on("redact_goal", function(voltage) {
         server.log("redact_goal");
     }
     if (goal_keeper.isGameInProgress()) {
-        goal_keeper.disallowLastGoal();
-        sendMessageToHipchat(goal_disallowed_message + " Score: " + goal_keeper.getScore(), "red");    
+        local lastPlayerScoredNum = goal_keeper.disallowLastGoal();
+        server.log("Player number to redact: " + lastPlayerScoredNum);
+        //sendMessageToHipchat(goal_disallowed_message + " Score: " + goal_keeper.getScore(), "red"); 
+        parse.runCloudFunction("playerGoalDisallowed", {"tableId": table_id, "playerNumber" : lastPlayerScoredNum}, function(err, response) {
+            server.log(serialize(response));
+        });
     }
 });
 
@@ -116,18 +145,30 @@ device.on("reset_game", function(voltage) {
     }
     if (goal_keeper.isGameInProgress()) {
         local final_score = goal_keeper.getScore();
-        sendMessageToHipchat("Final Score: " + goal_keeper.player_1_name + " " + final_score + " " + goal_keeper.player_2_name);
+        //sendMessageToHipchat("Final Score: " + goal_keeper.player_1_name + " " + final_score + " " + goal_keeper.player_2_name);
         goal_keeper.endGame();
         goal_keeper.reset();
+        parse.runCloudFunction("resetGame", {"tableId": table_id}, function(err, response) {
+            server.log(serialize(response));
+        });
         sendMessageToHipchat(game_reset_message, "yellow");
     }
 });
 
 
 
+
+
+
+/**
+ * 
+ * helper functions
+ * 
+ **/
+
 function checkVoltage(voltage) {
     if (voltage <= 3.4) {
-        sendMessageToHipChat(low_battery_message, "red");
+        sendMessageToHipchat(low_battery_message, "red");
     }
 }
 
@@ -137,10 +178,13 @@ function setTimer() {
     }
     timer = imp.wakeup(time_limit, function() {
         local final_score = goal_keeper.getScore();
-        sendMessageToHipchat("Final Score: " + goal_keeper.player_1_name + " " + final_score + " " + goal_keeper.player_2_name);
+        //sendMessageToHipchat("Final Score: " + goal_keeper.player_1_name + " " + final_score + " " + goal_keeper.player_2_name);
         
         goal_keeper.endGame();
         goal_keeper.reset();
+        parse.runCloudFunction("unlockTable", {"tableId": table_id}, function(err, response) {
+            server.log(serialize(response));
+        });
         sendMessageToHipchat(empty_table_message);
     });
 }
@@ -161,4 +205,46 @@ function httpPostWrapper (url, headers, string, log = false) {
         server.log("response: " + http.jsonencode(response));
     }
     return response;
+}
+
+
+function serialize(data, offset = "") {
+    local nextoff = offset + " ";
+    switch (typeof data) {
+        case "string":
+            return "\"" + data + "\"";
+        case "array":
+            local inner = [];
+            foreach (it in data) {
+                inner.append(serialize(it));
+            }
+            return "[\n" + nextoff + join(",\n"+nextoff, inner) + "\n" + offset + "]";
+        case "table":
+            local inner = [];
+            foreach (key, val in data) {
+                local sval = serialize(val, nextoff);
+                inner.append(key+" = "+sval);
+            }
+            return "{\n" + nextoff + join("\n"+nextoff, inner) + "\n" + offset + "}";
+        case "instance":
+            if (data instanceof Serializable) {
+                return data.serialize(nextoff);
+            } else {
+                return "instance of " + data.getclass();
+            }
+        default:
+            return data;
+    }
+}
+
+function join(glue, pieces) {
+    local joined = null;
+    foreach (it in pieces) {
+        if (joined == null) {
+            joined = it.tostring();
+        } else {
+            joined += glue + it.tostring();
+        }
+    }
+    return joined;
 }
