@@ -1,42 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Player 1 Score:"/>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/charcoal">
 
         <TextView
             android:id="@+id/player_1_score"
+            android:gravity="center"
+            android:textSize="@dimen/score_detail_size"
+            android:textColor="#fff"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-    </LinearLayout>
+    </FrameLayout>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Player 2 Score:"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/colorAccent">
 
         <TextView
             android:id="@+id/player_2_score"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
+            android:gravity="center"
+            android:textSize="@dimen/score_detail_size"
+            android:textColor="#fff"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </FrameLayout>
 
     <LinearLayout
+        android:layout_weight="0"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -55,3 +59,16 @@
             android:text="Reset Game"/>
     </LinearLayout>
 </LinearLayout>
+
+<android.support.design.widget.FloatingActionButton
+    android:id="@+id/play_button"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:layout_margin="16dp"
+    android:layout_centerInParent="true"
+    app:backgroundTint="@color/colorPrimary"
+    android:clickable="true"
+    android:visibility="gone"
+    android:src="@drawable/ic_play_arrow_black_24dp"/>
+</RelativeLayout>
