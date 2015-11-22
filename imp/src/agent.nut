@@ -12,6 +12,8 @@ local time_limit = 300;
 local low_battery_message = "@Doctor, I'm dying!";
 local game_started_message = "Table Occupied.";
 local empty_table_message = "No one is playing.";
+local device_connected = "HQ 1 Table is Online"
+local device_disconnected = "HQ 1 Table is Offline"
 local goal_stack = [];
 parse <- Parse(parse_appId, parse_apiKey);
 
@@ -24,13 +26,11 @@ parse <- Parse(parse_appId, parse_apiKey);
 device.on("player1_scored", function(voltage) {
     checkVoltage(voltage);
     playerScored(1);
-    setTimer();
 }); 
 
 device.on("player2_scored", function(voltage) {
     checkVoltage(voltage);
     playerScored(2);
-    setTimer();
 });
 
 device.on("redact_goal", function(voltage) {
@@ -44,7 +44,25 @@ device.on("reset_game", function(voltage) {
 });
 
 
+device.onconnect(function() {
+    server.log("Device connected to agent"); 
+    sendMessageToChipchat(device_connected);
+    parse.runCloudFunction("tableConnected", {"tableId": table_id}, function(err, response) {
+        server.log(serialize(response));
+    });
+});
+
+device.ondisconnect(function() { 
+    server.log("Device disconnected from agent");
+    sendMessageToHipchat(device_disconnected, "red");
+    parse.runCloudFunction("tableDisconnected", {"tableId": table_id}, function(err, response) {
+        server.log(serialize(response));
+    });
+});
+
+
 function playerScored(playerNum) {
+    setTimer();
     if (isLogging) {
         server.log("player " + playerNum + " scored");
     }
@@ -55,6 +73,7 @@ function playerScored(playerNum) {
 }
 
 function redactGoal() {
+    setTimer();
     if (isLogging) {
         server.log("redact_goal");
     }
@@ -92,16 +111,11 @@ function checkVoltage(voltage) {
 function setTimer() {
     if (timer != null) {
         imp.cancelwakeup(timer);
+    } else {
+        sendMessageToHipchat(game_started_message);
     }
     timer = imp.wakeup(time_limit, function() {
-        local final_score = goal_keeper.getScore();
-        //sendMessageToHipchat("Final Score: " + goal_keeper.player_1_name + " " + final_score + " " + goal_keeper.player_2_name);
-        
-        goal_keeper.endGame();
-        goal_keeper.reset();
-        parse.runCloudFunction("unlockTable", {"tableId": table_id}, function(err, response) {
-            server.log(serialize(response));
-        });
+        resetGame();
         sendMessageToHipchat(empty_table_message);
     });
 }
