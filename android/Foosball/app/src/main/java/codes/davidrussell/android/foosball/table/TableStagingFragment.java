@@ -192,11 +192,7 @@ public class TableStagingFragment extends Fragment {
         }
 
         if (mYellowPlayer != null && mBlackPlayer != null) {
-            if (mTable.getBoolean("locked")) {
-                mTableStagingListener.stagingFinished();
-            } else {
-                mPlayButton.setVisibility(View.VISIBLE);
-            }
+            mTableStagingListener.stagingFinished();
         }
     }
 }

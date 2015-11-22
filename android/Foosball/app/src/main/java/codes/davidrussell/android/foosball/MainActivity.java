@@ -47,8 +47,12 @@ public class MainActivity extends AppCompatActivity implements TableSelectedList
 
     @Override
     public void onTableSelected(ParseObject table) {
+        ParseUser player1 = table.getParseUser("player1");
+        ParseUser player2 = table.getParseUser("player2");
+        boolean gameStarted = player1 != null && player2 != null;
         Intent detailIntent = new Intent(this, TableDetailActivity.class);
         detailIntent.putExtra(TableDetailFragment.ARG_ITEM_ID, table.getObjectId());
+        detailIntent.putExtra(TableDetailFragment.ARG_SKIP_STAGING, gameStarted);
         startActivity(detailIntent);
     }
 

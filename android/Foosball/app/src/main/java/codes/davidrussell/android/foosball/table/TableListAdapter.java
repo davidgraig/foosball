@@ -64,6 +64,8 @@ public class TableListAdapter extends RecyclerView.Adapter<TableListViewHolder> 
 
     @NonNull
     private String getAvailabilityString(ParseObject parseObject) {
+        String connectionStatus = parseObject.getBoolean("isOnline") ? "" : "(offline)";
+
         ParseUser player1 = parseObject.getParseUser("player1");
         ParseUser player2 = parseObject.getParseUser("player2");
         int playerCount = 0;
@@ -73,6 +75,6 @@ public class TableListAdapter extends RecyclerView.Adapter<TableListViewHolder> 
         if (player2 != null) {
             playerCount++;
         }
-        return "players: " + playerCount + "/2";
+        return playerCount + "/2 " + connectionStatus;
     }
 }

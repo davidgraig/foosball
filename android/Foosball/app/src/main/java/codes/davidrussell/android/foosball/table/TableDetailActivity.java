@@ -34,7 +34,12 @@ public class TableDetailActivity extends AppCompatActivity implements TableStagi
         mScoreCard = new TableDetailFragment();
         mScoreCard.setArguments(bundle);
 
-        getSupportFragmentManager().beginTransaction().add(R.id.coordinator_layout, mStaging).commit();
+        boolean skipStaging = intent.getBooleanExtra(TableDetailFragment.ARG_SKIP_STAGING, false);
+        if (skipStaging) {
+            getSupportFragmentManager().beginTransaction().add(R.id.coordinator_layout, mScoreCard).commit();
+        } else {
+            getSupportFragmentManager().beginTransaction().add(R.id.coordinator_layout, mStaging).commit();
+        }
     }
 
 

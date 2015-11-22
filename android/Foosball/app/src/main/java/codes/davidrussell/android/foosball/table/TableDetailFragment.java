@@ -33,6 +33,7 @@ import rx.schedulers.Schedulers;
 public class TableDetailFragment extends Fragment {
 
     public static final String ARG_ITEM_ID = "ITEM_ID";
+    public static final String ARG_SKIP_STAGING = "SKIP_STAGING";
 
     @Bind(R.id.player_1_score)
     protected TextView mPlayer1Score;
