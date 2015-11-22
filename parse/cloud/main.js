@@ -1,4 +1,4 @@
-Parse.Cloud.define("playerScored", function(request, response) {
+Parse.Cloud.define("playerScored", function (request, response) {
 	tableId = request.params.tableId;
 	playerNumber = request.params.playerNumber;
 
@@ -22,7 +22,7 @@ Parse.Cloud.define("playerScored", function(request, response) {
 	});
 });
 
-Parse.Cloud.define("playerGoalDisallowed", function(request, response) {
+Parse.Cloud.define("playerGoalDisallowed", function (request, response) {
 	tableId = request.params.tableId;
 	playerNumber = request.params.playerNumber;
 
@@ -46,7 +46,7 @@ Parse.Cloud.define("playerGoalDisallowed", function(request, response) {
 	});
 });
 
-Parse.Cloud.define("submitGame", function(request, response) {
+Parse.Cloud.define("submitGame", function (request, response) {
 	Parse.Cloud.useMasterKey();
 
 	tableId = request.params.tableId;
@@ -93,14 +93,13 @@ Parse.Cloud.define("submitGame", function(request, response) {
 	});
 });
 
-Parse.Cloud.define("resetGame", function(request, response) {
+Parse.Cloud.define("resetGame", function (request, response) {
 	tableId = request.params.tableId;
 
 	var Table = Parse.Object.extend("Table");
 	var table = new Table();
 	table.id = tableId;
 
-	table.set("locked", false);
 	table.set("player1", null);
 	table.set("player1Score", 0);
 	table.set("player2", null);
@@ -108,10 +107,42 @@ Parse.Cloud.define("resetGame", function(request, response) {
 	// Save
 	table.save(null, {
 	  success: function(table) {
-	    response.success("unlocked");
+	    response.success("reset.");
 	  },
 	  error: function(table, error) {
-	    response.error("Error unlocking table: " + error);
+	    response.error("Error resetting table: " + error);
+	  }
+	});
+});
+
+Parse.Cloud.define("tableConnected", function (request, response) {
+	tableId = request.params.tableId;
+	var Table = Parse.Object.extend("Table");
+	var table = new Table();
+	table.id = tableId;
+	table.set("isOnline", true);
+	table.save(null, {
+		success: function(table) {
+	    response.success("online.");
+	  },
+	  error: function(table, error) {
+	    response.error("Error bringing table online: " + error);
+	  }
+	});
+});
+
+Parse.Cloud.define("tableDisconnected", function (request, response) {
+	tableId = request.params.tableId;
+	var Table = Parse.Object.extend("Table");
+	var table = new Table();
+	table.id = tableId;
+	table.set("isOnline", false);
+	table.save(null, {
+		success: function(table) {
+	    response.success("offline.");
+	  },
+	  error: function(table, error) {
+	    response.error("Error bringing table offline: " + error);
 	  }
 	});
 });
