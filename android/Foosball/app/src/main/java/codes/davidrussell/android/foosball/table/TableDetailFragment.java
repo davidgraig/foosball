@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.parse.FunctionCallback;
@@ -39,6 +41,8 @@ public class TableDetailFragment extends Fragment {
     protected TextView mPlayer1Score;
     @Bind(R.id.player_2_score)
     protected TextView mPlayer2Score;
+    @Bind(R.id.game_actions)
+    LinearLayout mGameActions;
 
     private ParseObject mTable;
     private Subscription mTimerSubscription;
@@ -58,6 +62,11 @@ public class TableDetailFragment extends Fragment {
                     getActivity().setTitle(mTable.getString("name"));
                     mPlayer1Score.setText(player1Score);
                     mPlayer2Score.setText(player2Score);
+                    ParseUser player1 = mTable.getParseUser("player1");
+                    ParseUser player2 = mTable.getParseUser("player2");
+                    if (ParseUser.getCurrentUser().equals(player1) || ParseUser.getCurrentUser().equals(player2)) {
+                        mGameActions.setVisibility(View.VISIBLE);
+                    }
                 } else {
                     getActivity().finish();
                 }
@@ -71,6 +80,9 @@ public class TableDetailFragment extends Fragment {
                     @Override
                     public void done(ParseObject object, ParseException e) {
                         if (e == null) {
+                            if (object.getParseUser("player1") == null || object.getParseUser("player2") == null) {
+                                getActivity().finish();
+                            }
                             mPlayer1Score.setText(String.valueOf(object.getInt("player1Score")));
                             mPlayer2Score.setText(String.valueOf(object.getInt("player2Score")));
                         } else {
@@ -83,6 +95,16 @@ public class TableDetailFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onDetach() {
+
+        if (mTimerSubscription != null && !mTimerSubscription.isUnsubscribed()) {
+            mTimerSubscription.unsubscribe();
+        }
+
+        super.onDetach();
     }
 
     @OnClick(R.id.commit_game)
