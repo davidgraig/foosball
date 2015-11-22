@@ -1,22 +1,19 @@
-function wakeUp() {
-    if (wake_pin.read() == 0) {
-        agentSend("wake_up");
+local player1Scored = false;
+
+function scored() {
+    if (scored_pin.read() == 0) {
+        if (player1Scored) {
+            agentSend("player1_scored");
+        } else {
+            agentSend("player2_scored");
+        }
+        player1Scored = false;
     }
 }
 
 function player1Score() {
-    if (player1_pin.read() == 0) {
-        agentSend("player1_scored");
-    }
+    player1Scored = true;
 }
-
-
-function player2Score() {
-    if (player2_pin.read() == 1) {
-        agentSend("player2_scored");
-    }
-}
-
 
 function redactGoal() {
     if (redact_goal_pin.read() == 0) {
@@ -34,7 +31,7 @@ function resetGame() {
 function agentSend(string) {
     local voltage = getVoltage();
     agent.send(string, voltage);
-    imp.sleep(2.00);
+    imp.sleep(1.00);
 }
 
 function getVoltage() {
@@ -43,14 +40,13 @@ function getVoltage() {
     return (reading / 6553.5) * voltage;
 }
 
-wake_pin <- hardware.pin1;
+scored_pin <- hardware.pin1;
 player1_pin <- hardware.pin2;
-player2_pin <- hardware.pin5;
 redact_goal_pin <- hardware.pin7;
 reset_game_pin <- hardware.pin8;
 voltage_pin <- hardware.pin9;
 
-wake_pin.configure(DIGITAL_IN_PULLUP, wakeUp);
+scored_pin.configure(DIGITAL_IN_PULLUP, scored);
 player1_pin.configure(DIGITAL_IN_PULLUP, player1Score);
 player2_pin.configure(DIGITAL_IN_PULLUP, player2Score);
 redact_goal_pin.configure(DIGITAL_IN_PULLUP, redactGoal);
