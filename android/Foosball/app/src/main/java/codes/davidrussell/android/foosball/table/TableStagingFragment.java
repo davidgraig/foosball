@@ -1,15 +1,14 @@
 package codes.davidrussell.android.foosball.table;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.GetCallback;
@@ -40,8 +39,10 @@ public class TableStagingFragment extends Fragment {
     Button mPlayAsBlack;
     @Bind(R.id.play_as_yellow)
     Button mPlayAsYellow;
-    @Bind(R.id.play_button)
-    FloatingActionButton mPlayButton;
+    @Bind(R.id.cancel_black)
+    Button mCancelBlack;
+    @Bind(R.id.cancel_yellow)
+    Button mCancelYellow;
 
     private ParseObject mTable;
     private ParseUser mBlackPlayer;
@@ -119,7 +120,9 @@ public class TableStagingFragment extends Fragment {
         mTable.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                if (e != null) {
+                if (e == null) {
+                    mPlayAsBlack.setVisibility(View.VISIBLE);
+                } else {
                     Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Error registering with table: " + e.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
                 }
             }
@@ -134,23 +137,33 @@ public class TableStagingFragment extends Fragment {
         mTable.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                if (e != null) {
+                if (e == null) {
+                    mPlayAsYellow.setVisibility(View.VISIBLE);
+                } else {
                     Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Error registering with table: " + e.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
                 }
             }
         });
     }
 
-    @OnClick(R.id.play_button)
-    public void onPlayButtonClicked(View view) {
-        mTable.put("locked", true);
-        mTable.put("player1Score", 0);
-        mTable.put("player2Score", 0);
+    @OnClick(R.id.cancel_yellow)
+    protected void onCancelYellowClicked(View view) {
+        cancelRegistration("player2");
+    }
+
+
+    @OnClick(R.id.cancel_black)
+    protected void onCancelBlackClicked(View view) {
+        cancelRegistration("player1");
+    }
+
+    private void cancelRegistration(@NonNull final String playerColumnTitle) {
+        mTable.remove(playerColumnTitle);
         mTable.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                if (e == null) {
-                    mTableStagingListener.stagingFinished();
+                if (e != null) {
+                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Error cancelling registration for " + playerColumnTitle + " with table: " + e.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
                 }
             }
         });
@@ -164,6 +177,7 @@ public class TableStagingFragment extends Fragment {
                     if (e == null) {
                         mPlayAsBlack.setEnabled(false);
                         mPlayAsBlack.setText(mBlackPlayer.getUsername());
+                        mCancelBlack.setVisibility(View.VISIBLE);
                         if (ParseUser.getCurrentUser() == mBlackPlayer) {
                             mPlayAsYellow.setEnabled(false);
                             if (mYellowPlayer == null) {
@@ -173,6 +187,14 @@ public class TableStagingFragment extends Fragment {
                     }
                 }
             });
+        } else {
+            mPlayAsBlack.setEnabled(true);
+            mPlayAsBlack.setText(R.string.play_as_black);
+            mCancelBlack.setVisibility(View.GONE);
+            if (mPlayAsYellow.getText().toString().equals(getString(R.string.waiting_for_opponent))) {
+                mPlayAsYellow.setEnabled(true);
+                mPlayAsYellow.setText(R.string.play_as_yellow);
+            }
         }
         if (mYellowPlayer != null) {
             mYellowPlayer.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
@@ -180,6 +202,7 @@ public class TableStagingFragment extends Fragment {
                 public void done(ParseObject object, ParseException e) {
                     mPlayAsYellow.setEnabled(false);
                     mPlayAsYellow.setText(mYellowPlayer.getUsername());
+                    mCancelYellow.setVisibility(View.VISIBLE);
                     if (ParseUser.getCurrentUser() == mYellowPlayer) {
                         mPlayAsBlack.setEnabled(false);
                         if (mBlackPlayer == null) {
@@ -189,6 +212,14 @@ public class TableStagingFragment extends Fragment {
                 }
             });
 
+        } else {
+            mPlayAsYellow.setEnabled(true);
+            mPlayAsYellow.setText(R.string.play_as_yellow);
+            mCancelYellow.setVisibility(View.GONE);
+            if (mPlayAsBlack.getText().toString().equals(getString(R.string.waiting_for_opponent))) {
+                mPlayAsBlack.setEnabled(true);
+                mPlayAsBlack.setText(R.string.play_as_black);
+            }
         }
 
         if (mYellowPlayer != null && mBlackPlayer != null) {

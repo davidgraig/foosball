@@ -15,6 +15,7 @@
     <string name="play_as_yellow">PLAY AS YELLOW</string>
     <string name="playing_as_yellow">PLAYING AS YELLOW</string>
     <string name="waiting_for_opponent">waiting for opponent…</string>
+    <string name="cancel_x">X</string>
     <string-array
         name="score_values">
         <item>0</item>

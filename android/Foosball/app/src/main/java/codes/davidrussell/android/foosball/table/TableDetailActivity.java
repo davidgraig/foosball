@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
@@ -22,8 +23,9 @@ public class TableDetailActivity extends AppCompatActivity implements TableStagi
         Intent intent = getIntent();
         String tableId = intent.getStringExtra(TableDetailFragment.ARG_ITEM_ID);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
 
         Bundle bundle = new Bundle();
         bundle.putString(TableDetailFragment.ARG_ITEM_ID, tableId);
