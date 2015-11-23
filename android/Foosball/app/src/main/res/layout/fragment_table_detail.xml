@@ -1,76 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                xmlns:app="http://schemas.android.com/apk/res-auto">
-
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/charcoal">
-
-        <TextView
-            android:id="@+id/player_1_score"
-            android:gravity="center"
-            android:textSize="@dimen/score_detail_size"
-            android:textColor="#fff"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/colorAccent">
-
-        <TextView
-            android:id="@+id/player_2_score"
-            android:gravity="center"
-            android:textSize="@dimen/score_detail_size"
-            android:textColor="#fff"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </FrameLayout>
+                android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/game_actions"
-        android:layout_weight="0"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/commit_game"
-            android:layout_width="0dp"
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Submit Game"/>
+            android:background="@color/charcoal">
 
-        <Button
-            android:id="@+id/reset_game"
-            android:layout_width="0dp"
+            <com.wefika.horizontalpicker.HorizontalPicker
+                android:id="@+id/player_1_score_picker"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:ellipsize="marquee"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:marqueeRepeatLimit="2"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:textSize="@dimen/score_detail_size"
+                android:textColor="#fff"
+                app:dividerSize="10dp"
+                app:sideItems="0"
+                app:values="@array/score_values"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
+            android:background="@color/colorAccent">
+
+            <com.wefika.horizontalpicker.HorizontalPicker
+                android:id="@+id/player_2_score_picker"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:ellipsize="marquee"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:marqueeRepeatLimit="2"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:textSize="@dimen/score_detail_size"
+                android:textColor="#fff"
+                app:dividerSize="@dimen/score_detail_size"
+                app:sideItems="0"
+                app:values="@array/score_values"/>
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/game_actions"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Reset Game"/>
+            android:layout_weight="0"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/commit_game"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Submit Game"/>
+
+            <Button
+                android:id="@+id/reset_game"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Reset Game"/>
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
 
-<android.support.design.widget.FloatingActionButton
-    android:id="@+id/play_button"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom"
-    android:layout_margin="16dp"
-    android:layout_centerInParent="true"
-    app:backgroundTint="@color/colorPrimary"
-    android:clickable="true"
-    android:visibility="gone"
-    android:src="@drawable/ic_play_arrow_black_24dp"/>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/play_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_gravity="bottom"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:src="@drawable/ic_play_arrow_black_24dp"
+        android:visibility="gone"
+        app:backgroundTint="@color/colorPrimary"/>
 </RelativeLayout>

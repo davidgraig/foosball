@@ -6,9 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.parse.FunctionCallback;
 import com.parse.GetCallback;
@@ -17,6 +15,8 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
+import com.wefika.horizontalpicker.HorizontalPicker;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,12 +37,14 @@ public class TableDetailFragment extends Fragment {
     public static final String ARG_ITEM_ID = "ITEM_ID";
     public static final String ARG_SKIP_STAGING = "SKIP_STAGING";
 
-    @Bind(R.id.player_1_score)
-    protected TextView mPlayer1Score;
-    @Bind(R.id.player_2_score)
-    protected TextView mPlayer2Score;
     @Bind(R.id.game_actions)
     LinearLayout mGameActions;
+
+    @Bind(R.id.player_1_score_picker)
+    HorizontalPicker mPlayer1ScorePicker;
+
+    @Bind(R.id.player_2_score_picker)
+    HorizontalPicker mPlayer2ScorePicker;
 
     private ParseObject mTable;
     private Subscription mTimerSubscription;
@@ -57,13 +59,20 @@ public class TableDetailFragment extends Fragment {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     mTable = object;
-                    String player1Score = String.valueOf(mTable.getInt("player1Score"));
-                    String player2Score = String.valueOf(mTable.getInt("player2Score"));
+                    int player1Score = mTable.getInt("player1Score");
+                    int player2Score = mTable.getInt("player2Score");
                     getActivity().setTitle(mTable.getString("name"));
-                    mPlayer1Score.setText(player1Score);
-                    mPlayer2Score.setText(player2Score);
+                    mPlayer1ScorePicker.setSelectedItem(player1Score);
+                    mPlayer2ScorePicker.setSelectedItem(player2Score);
                     ParseUser player1 = mTable.getParseUser("player1");
                     ParseUser player2 = mTable.getParseUser("player2");
+                    if (mTable.getBoolean("isOnline")) {
+                        mPlayer1ScorePicker.setEnabled(false);
+                        mPlayer2ScorePicker.setEnabled(false);
+                    } else {
+                        mPlayer1ScorePicker.setSideItems(1);
+                        mPlayer2ScorePicker.setSideItems(1);
+                    }
                     if (ParseUser.getCurrentUser().equals(player1) || ParseUser.getCurrentUser().equals(player2)) {
                         mGameActions.setVisibility(View.VISIBLE);
                     }
@@ -73,28 +82,59 @@ public class TableDetailFragment extends Fragment {
             }
         });
 
-        mTimerSubscription = Observable.interval(2, TimeUnit.SECONDS, Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Long>() {
+        mPlayer2ScorePicker.setOnItemSelectedListener(new HorizontalPicker.OnItemSelected() {
             @Override
-            public void call(Long parseObject) {
-                mTable.fetchInBackground(new GetCallback<ParseObject>() {
-                    @Override
-                    public void done(ParseObject object, ParseException e) {
-                        if (e == null) {
-                            if (object.getParseUser("player1") == null || object.getParseUser("player2") == null) {
-                                getActivity().finish();
-                            }
-                            mPlayer1Score.setText(String.valueOf(object.getInt("player1Score")));
-                            mPlayer2Score.setText(String.valueOf(object.getInt("player2Score")));
-                        } else {
-                            Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Error updating : " + e.getLocalizedMessage(), Snackbar.LENGTH_LONG);
-                        }
-                    }
-                });
-
+            public void onItemSelected(int index) {
+                // Update score
+                updateScore("player2Score", index);
             }
         });
 
+        mPlayer1ScorePicker.setOnItemSelectedListener(new HorizontalPicker.OnItemSelected() {
+            @Override
+            public void onItemSelected(int index) {
+                updateScore("player1Score", index);
+            }
+        });
+
+        mTimerSubscription = Observable.interval(2, TimeUnit.SECONDS, Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Long>() {
+                    @Override
+                    public void call(Long parseObject) {
+                        if (mTable != null) {
+                            mTable.fetchInBackground(new GetCallback<ParseObject>() {
+                                @Override
+                                public void done(ParseObject object, ParseException e) {
+                                    if (e == null) {
+                                        if (object.getParseUser("player1") == null || object.getParseUser("player2") == null) {
+                                            getActivity().finish();
+                                        }
+                                        int player1Score = object.getInt("player1Score");
+                                        int player2Score = object.getInt("player2Score");
+                                        mPlayer1ScorePicker.setSelectedItem(player1Score);
+                                        mPlayer2ScorePicker.setSelectedItem(player2Score);
+                                    } else {
+                                        Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Error updating : " + e.getLocalizedMessage(), Snackbar.LENGTH_LONG);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
         return view;
+    }
+
+    private void updateScore(String playerColumnName, int index) {
+        mTable.put(playerColumnName, index);
+        mTable.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Snackbar.make(getActivity().findViewById(R.id.coordinator_layout), "Error updating score: " + e.getLocalizedMessage(), Snackbar.LENGTH_LONG);
+                }
+            }
+        });
     }
 
     @Override

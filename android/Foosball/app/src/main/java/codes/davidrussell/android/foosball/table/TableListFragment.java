@@ -83,6 +83,18 @@ public class TableListFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mSwipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(true);
+            }
+        });
+        refreshTableList();
+    }
+
     private void refreshTableList() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Table");
         ParseObservable.find(query)
