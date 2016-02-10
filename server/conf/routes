@@ -1,0 +1,37 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# TEST PAGE
+GET           /test                               controllers.Application.test
+
+# AUTHENTICATION
+POST          /signin                             controllers.Auth.signIn
+POST          /signout                            controllers.Auth.signOut
+POST          /signup                             controllers.Auth.signUp
+
+# ACCOUNT
+GET           /account                            controllers.Account.info
+PUT           /account                            controllers.Account.update
+PUT           /account/password                   controllers.Account.updatePassword
+DELETE        /account                            controllers.Account.delete
+
+GET           /tables                             controllers.Tables.list
+GET           /table/:id                          controllers.Tables.info(id: Long)
+PUT           /table/:id/goal/:isPlayer1          controllers.Tables.goal(id: Long, isPlayer1: Boolean)
+PUT           /table/:id/redact/:isPlayer1        controllers.Tables.redact(id: Long, isPlayer1: Boolean)
+PUT           /table/:id/reset                    controllers.Tables.reset(id: Long)
+PUT           /table/:id/online                   controllers.Tables.setOnline(id: Long)
+PUT           /table/:id/offline                  controllers.Tables.setOffline(id: Long)
+
+POST          /game/:id                           controllers.GameRecords.submit(id: Long)
+
+GET           /users                              controllers.Users.list
+GET           /user/:id                           controllers.Users.info(id: Long)
+
+# Map static resources from the /public folder to the /assets URL path
+GET           /assets/*file                       controllers.Assets.versioned(path="/public", file: Asset)
+
+# SHOW FAKE DB DATA
+# Auxiliar to check the FakeDB information. It's only for testing purpose. You should remove it.
+GET           /fakeDB                             controllers.Application.fakeDB
